@@ -13,3 +13,7 @@ I'd like to be able to persist the croppings for future review and learning. Thi
 ## Potentiality
 
 After a few minutes review from native speakers (my parents) with respect to its performance against real-world documentation, it appears to be promising enough to justify further exploration.
+
+## Further Exploration
+
+It's often unclear how to pronounce certain words. Especially in Farsi, pronunciation will decrypt some ambiguous characters given that the word itself is what disambiguates individual characters. It's like a chicken and egg scenario where you need familiarity with the word in order to know the letters, but you can't learn the word from knowing letters because the letters are ambiguous until you know the word already unto which to match it from memory... Question here is can HTML5 speech synthesis (or any speech synthesis tool for that matter, be it generated on the server and sent over) utter Farsi text?
