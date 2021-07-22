@@ -1,5 +1,8 @@
 const spawn = require('child_process').spawn;
 const fs = require('fs');
+const speak = require('./speak');
+// const crypto = require('crypto');
+//let hash = crypto.createHash('md5').update(req.body.content).digest("hex");
 
 
 function ocr(imageFile) {
@@ -51,11 +54,16 @@ function translate(inputText) {
     });
 }
 
+const recordingCache = {};
+const translationCache = {};
+
 module.exports = async function(imageFile) {
     let ocrText = null;
     let ocrError = null;
     let translation = null;
     let translateError = null;
+    let recordingURL = null;
+    let recordingError= null;
     try {
         ocrText = await ocr(imageFile);
         if (ocrText.trim().length < 1) {
@@ -65,11 +73,27 @@ module.exports = async function(imageFile) {
         error = ocrError
     }
     if (!ocrError) {
-        try {
-            translation = await translate(ocrText);
-        } catch(err) {
-            translateError = err;
+        if (translationCache[ocrText]) {
+            translation = translationCache[ocrText];
+        } else {
+            try {
+                translation = await translate(ocrText);
+                translationCache[ocrText] = translation;
+            } catch(err) {
+                translateError = err;
+            }
+        }
+        if (recordingCache[ocrText]) {
+            recordingURL = recordingCache[ocrText]
+        } else {
+            try {
+                recordingURL = await speak(ocrText);
+                recordingCache[ocrText] = recordingURL;
+            } catch(err) {
+                console.log(err.stack);
+                recordingError = err;
+            }
         }
     }
-    return { ocrError, ocrText, translation, translateError }
+    return { ocrError, ocrText, translation, translateError, recordingURL, recordingError }
 }

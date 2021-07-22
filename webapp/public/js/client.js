@@ -131,7 +131,8 @@ $(document).ready(function () {
                     var myXhr = $.ajaxSettings.xhr();
                     myXhr.addEventListener('load', ()=>{
                         let resp = JSON.parse(myXhr.responseText);
-                        let { ocrError, ocrText, translation, translateError } = resp;
+                        console.log(resp);
+                        let { ocrError, ocrText, translation, translateError, recordingURL } = resp;
                         if (ocrError) {
                             p.innerHTML = "OCR Error: "+resp.ocrError;
                         } else if (translateError) {
@@ -139,6 +140,14 @@ $(document).ready(function () {
                             p.innerHTML += "Translate Error: "+resp.ocrError;
                         } else {
                             p.innerHTML = ocrText + "=" +translation.join('<br>');
+                        }
+                        if (recordingURL) {
+                            console.log("Append");
+                            var sound      = document.createElement('audio');
+                            sound.controls = 'controls';
+                            sound.src      = recordingURL;
+                            sound.type     = 'audio/aac';
+                            div.appendChild(sound);
                         }
                     })
                     return myXhr;
