@@ -13,7 +13,7 @@ app.use('/tmp', express.static('tmp'));
 app.post('/ocr', async function (req, res) {
     let dest = __dirname+'/tmp/last-img.png';
     await req.files.image.mv(dest);
-    res.json(result);
+    res.json({});
 });
 
 app.post('/crop', async function (req, res) {
