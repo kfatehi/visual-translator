@@ -15,6 +15,7 @@ module.exports = function ocr(imageFile) {
         tesseract.on('exit', (code)=>{
             if (code === 0) {
                 let ocr = fs.readFileSync(textFile).toString();
+                console.log(ocr)
                 resolve(ocr)
             } else {
                 reject({ stdout, stderr });

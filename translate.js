@@ -35,19 +35,23 @@ function ocr(imageFile) {
 
 function translate(inputText) {
     return new Promise((resolve, reject) => {
-        let dt = spawn('deep_translator', [
-            '--translator', 'google', 
-            '-src', 'fa', '-tg', 'en', '-txt', inputText]);
+        console.log(inputText)
+        let dt = spawn('argos-translate', [
+            '--from-lang', 'fa', 
+            '--to-lang', 'en', inputText]);
 
         let stdout = '';
         let stderr = '';
         dt.stdout.on('data', data=>stdout += data.toString());
         dt.stderr.on('data', data=>stderr += data.toString());
-    
+        
         dt.on('exit', (code)=>{
+            console.log(stdout)
+            console.log(stderr)
             if (code === 0) {
                 resolve(stdout.split('\n').slice(2,-1).map(i=>i.trim()));
             } else {
+                
                 reject(stderr);
             }
         })

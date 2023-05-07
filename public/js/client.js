@@ -43,7 +43,6 @@ $(document).ready(function () {
 
 
     /// LENSING 
-
     let lens = $('#lens');
     lens.css({
         position: 'absolute',
@@ -71,38 +70,55 @@ $(document).ready(function () {
         lensPos = { x, y};
         lens.css({
             left: lensTargetOffset.left+x,
-            top:  lensTargetOffset.top+y
+            top:  lensTargetOffset.top+y,
+            'pointer-events': 'none'
         })
         
         ev.preventDefault();
     }
     function dragMove(ev) {
-        if (! lensing) { return; }
-
+        if (!lensing) { return; }
+    
         let x = ev.originalEvent.layerX - ev.toElement.offsetLeft;
         let y = ev.originalEvent.layerY - ev.toElement.offsetTop;
-
-        lensDim = { height: y-lensPos.y, width: x-lensPos.x}
-        lens.css({...lensDim, display: 'block' })
-
+    
+        let deltaX = x - lensPos.x;
+        let deltaY = y - lensPos.y;
+    
+        // Calculate the position and dimensions of the lens box
+        let boxLeft = deltaX < 0 ? lensTargetOffset.left + x : lensTargetOffset.left + lensPos.x;
+        let boxTop = deltaY < 0 ? lensTargetOffset.top + y : lensTargetOffset.top + lensPos.y;
+        let boxWidth = Math.abs(deltaX);
+        let boxHeight = Math.abs(deltaY);
+    
+        lensDim = { height: boxHeight, width: boxWidth };
+        lens.css({ left: boxLeft, top: boxTop, ...lensDim, display: 'block' });
+    
         ev.preventDefault();
-    }
-    function dragEnd(ev){
+    }    
+    function dragEnd(ev) {
+        if (!lensing) { return; }
+
         lensing = false;
         lens.css({ display: 'none' });
         let { height, width } = lensDim;
         if (!(height > 5 && width > 5)) { return; }
+    
+        // Update lensPos coordinates based on the starting corner
+        let x = lens.css('left').slice(0, -2) - lensTargetOffset.left;
+        let y = lens.css('top').slice(0, -2) - lensTargetOffset.top;
+        lensPos = { x, y };
+    
         const div = document.createElement('div');
         const p = document.createElement('p');
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
         canvas.width = width;
         canvas.height = height;
-        let { x, y } = lensPos;
         let img = $('img').get(0);
         ctx.drawImage(img, x, y, width, height, 0, 0, width, height);
         ctx.save();
-        canvas.toBlob(function(blob) {
+        canvas.toBlob(function (blob) {
             var newImg = document.createElement('img'),
                 url = URL.createObjectURL(blob);
             
@@ -165,4 +181,11 @@ $(document).ready(function () {
     
     $('img').on('touchend', dragEnd);
     $('img').on('mouseup', dragEnd);
+
+    $('img').on('mouseleave', dragEnd);
+    $('img').on('touchleave', dragEnd);
 })
+
+// ===
+// "Lensing" in this program means to draw a box using the mouse or the finger.
+// there is a bug where the dragEnd (canvas.toBlob ajax call) keeps firing for no reason, even when page isn't being interacted with. Can you see the reason?
