@@ -1,7 +1,7 @@
 run: build
 	npm i
 	mkdir -p tmp
-	docker run --gpus all --rm -v ${PWD}/tesseract_models:/tess -v ${PWD}/argos_models:/argos -v ${PWD}:/home/user/app -p 3000:3000 -i -t translation-service
+	docker run --gpus all --rm -v ${PWD}/tesseract_models:/tess -v ${PWD}/argos_models:/argos -v ${PWD}:/home/user/app -p 3001:3000 -i -t translation-service
 
 bash: build
 	docker run --gpus all --rm -v ${PWD}/tesseract_models:/tess -v ${PWD}/argos_models:/argos -v ${PWD}:/home/user/app -i -t translation-service /bin/bash

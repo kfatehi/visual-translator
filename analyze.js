@@ -1,9 +1,6 @@
 const spawn = require('child_process').spawn;
 const fs = require('fs');
 const speak = require('./speak');
-// const crypto = require('crypto');
-//let hash = crypto.createHash('md5').update(req.body.content).digest("hex");
-
 
 function ocr(imageFile) {
     return new Promise((resolve, reject) => {
@@ -18,7 +15,7 @@ function ocr(imageFile) {
     
         tesseract.on('exit', (code)=>{
             if (code === 0) {
-                let ocr = fs.readFileSync(textFile).toString();
+                let ocr = fs.readFileSync(textFile).toString().trim();
                 resolve(ocr)
             } else {
                 reject({ stdout, stderr });
@@ -46,13 +43,11 @@ function translate(inputText) {
         dt.stderr.on('data', data=>stderr += data.toString());
         
         dt.on('exit', (code)=>{
-            console.log(stdout)
-            console.log(stderr)
+            console.log({ code, stdout, stderr})
             if (code === 0) {
-                resolve(stdout.split('\n').slice(2,-1).map(i=>i.trim()));
+                resolve(stdout.trim());
             } else {
-                
-                reject(stderr);
+                reject(stderr.trim());
             }
         })
     });

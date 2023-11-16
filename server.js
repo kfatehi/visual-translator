@@ -1,5 +1,5 @@
 const express = require('express');
-const translate = require('./translate');
+const analyze = require('./analyze');
 
 const app = express();
 
@@ -10,7 +10,7 @@ app.use(require('express-fileupload')({
 app.use('/', express.static('public'));
 app.use('/tmp', express.static('tmp'));
 
-app.post('/ocr', async function (req, res) {
+app.post('/upload', async function (req, res) {
     let dest = __dirname+'/tmp/last-img.png';
     await req.files.image.mv(dest);
     res.json({});
@@ -19,7 +19,7 @@ app.post('/ocr', async function (req, res) {
 app.post('/crop', async function (req, res) {
     let dest = __dirname+'/tmp/crop.png';
     await req.files.crop.mv(dest);
-    let result = await translate(dest);
+    let result = await analyze(dest);
     res.json(result);
 });
 

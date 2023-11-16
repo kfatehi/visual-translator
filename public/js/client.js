@@ -18,7 +18,7 @@ $(document).ready(function () {
         
         $.ajax({
             // Your server script to process the upload
-            url: "/ocr",
+            url: "/upload",
             type: 'POST',
 
             // Form data
@@ -41,6 +41,11 @@ $(document).ready(function () {
         });
     });
 
+    document.onpaste = (evt) => {
+        const dT = evt.clipboardData || window.clipboardData;
+        const file = dT.files[ 0 ];
+        fileReader.readAsArrayBuffer(file);
+    };
 
     /// LENSING 
     let lens = $('#lens');
@@ -151,11 +156,14 @@ $(document).ready(function () {
                         let { ocrError, ocrText, translation, translateError, recordingURL } = resp;
                         if (ocrError) {
                             p.innerHTML = "OCR Error: "+resp.ocrError;
-                        } else if (translateError) {
+                        } else if (translateError || translation.length === 0) {
                             p.innerHTML = resp.ocrText + "<br>";
-                            p.innerHTML += "Translate Error: "+resp.ocrError;
+                            if (translateError)
+                                p.innerHTML += "Translate Error: "+resp.ocrError;
+                            else
+                                p.innerHTML += "Translation failed.";
                         } else {
-                            p.innerHTML = ocrText + "=" +translation.join('<br>');
+                            p.innerHTML = ocrText +"<br>"+translation.replace(/\n/g,'<br>');
                         }
                         if (recordingURL) {
                             console.log("Append");
@@ -185,7 +193,3 @@ $(document).ready(function () {
     $('img').on('mouseleave', dragEnd);
     $('img').on('touchleave', dragEnd);
 })
-
-// ===
-// "Lensing" in this program means to draw a box using the mouse or the finger.
-// there is a bug where the dragEnd (canvas.toBlob ajax call) keeps firing for no reason, even when page isn't being interacted with. Can you see the reason?
